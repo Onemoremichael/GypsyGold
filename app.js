@@ -335,6 +335,22 @@ function extractImageData(data) {
   return `data:${mime};base64,${inline.data}`;
 }
 
+function looksLikeHtml(bodyText) {
+  return /^\s*</.test(bodyText);
+}
+
+function parseJsonSafely(bodyText) {
+  if (!bodyText) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(bodyText);
+  } catch {
+    return null;
+  }
+}
+
 async function generateImage() {
   if (state.step < 3) {
     setStatus("Finish all 3 steps before generating a preview image.", "error");
@@ -380,10 +396,23 @@ async function generateImage() {
       signal: inFlightController.signal,
     });
 
-    const data = await response.json();
+    const bodyText = await response.text();
+    const data = parseJsonSafely(bodyText);
+    const contentType = response.headers.get("content-type") || "";
+    const nonJsonLike = !contentType.includes("application/json") && !data;
 
     if (!response.ok) {
-      throw new Error(data?.error?.message || "Image generation request failed.");
+      if (response.status === 501 || (nonJsonLike && looksLikeHtml(bodyText))) {
+        throw new Error(
+          "Image API is unavailable on this server. Start the app with `npm start` (Node backend), not a static server."
+        );
+      }
+
+      throw new Error(data?.error?.message || `Image generation request failed (${response.status}).`);
+    }
+
+    if (!data) {
+      throw new Error("Server returned a non-JSON response. Restart with `npm start` and try again.");
     }
 
     const imageUrl = data?.imageUrl || extractImageData(data);
