@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = Number(process.env.PORT || 4173);
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const GEMINI_API_KEY = "[REMOVED_GEMINI_KEY]";
 const ALLOWED_MODELS = new Set([
   "gemini-2.5-flash-image",
   "gemini-3.1-flash-image-preview",
@@ -122,7 +122,14 @@ app.post("/api/generate-image", async (req, res) => {
     const requestBody = {
       contents: [
         {
-          parts: [referencePart, { text: prompt }],
+          parts: [
+            referencePart,
+            {
+              text: "Reference lock: edit the same plush identity from the provided image. Do not invent a different plush model.",
+            },
+            { text: prompt },
+            referencePart,
+          ],
         },
       ],
       generationConfig: {

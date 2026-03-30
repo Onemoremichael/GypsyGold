@@ -288,17 +288,38 @@ function buildPrompt(kind) {
     hair_length_percent: state.hairLength,
     fluffiness_percent: state.fluffiness,
   };
+  const accessoryRule =
+    state.accessory === "none"
+      ? "Accessory lock: no accessory at all (no bow, no bandana, no crown, no charm)."
+      : `Accessory lock: include exactly this accessory and no extras: ${labels.accessory[state.accessory]}.`;
 
   return [
     "Create exactly one image.",
-    "Primary subject: a stylized Gypsy Vanner-inspired plush toy horse.",
-    "Use the provided reference image for plush shape, stitching language, and toy silhouette only.",
-    "Do not copy color palette from the reference image when it conflicts with selection locks.",
+    "TASK MODE: edit the provided reference image of a plush horse.",
+    "Primary subject: the same plush toy identity as the reference, not a new plush design.",
+    "Reference adherence priority is very high.",
+    "Keep at least 90% visual identity match to the reference plush.",
     "Selection locks below are the source of truth and must be matched exactly.",
     "This must look like a stuffed toy only.",
     "Hard constraints: no realistic horse photography, no biological horse anatomy realism, no real fur detail, no humans.",
     "Required toy traits: rounded plush proportions, visible stitched seams, soft stuffed texture, collectible keepsake look.",
     "Critical breed cue: keep classic Gypsy Vanner long hair in plush form with a long mane, full long tail, and abundant lower-leg feathering.",
+    "",
+    "IDENTITY ANCHORS TO PRESERVE (do not change):",
+    "- overall plush silhouette and body proportions",
+    "- head shape, muzzle shape, ear size and ear placement",
+    "- neck length to body ratio",
+    "- leg thickness and hoof shape",
+    "- yarn/fiber construction style and seam style",
+    "- camera framing and product-shot composition",
+    "- toy material realism level (plush toy, not real horse)",
+    "",
+    "ONLY THESE TRAITS MAY CHANGE:",
+    "- coat pattern and coat color according to selection locks",
+    "- mane style/color and tail color",
+    "- leg feather color",
+    "- eye style and expression",
+    "- accessory choice",
     "",
     "SELECTION CARD (exact requirements):",
     JSON.stringify(selectionCard, null, 2),
@@ -308,17 +329,17 @@ function buildPrompt(kind) {
     buildStrictColorRule("Mane color", strictTraitValues.maneColor, state.maneColor),
     buildStrictColorRule("Tail color", strictTraitValues.tailColor, state.tailColor),
     buildStrictColorRule("Leg feather color", strictTraitValues.featherColor, state.featherColor),
+    accessoryRule,
     "",
     "Pattern rule: keep the selected coat pattern while applying the selected coat base color as the dominant dark/primary regions.",
     "Hair rule: mane and tail must stay long and dramatic, and leg feathering must be thick and visible.",
     "Size cue: standard hug size plush (about 16 inches).",
-    `Staging: ${FIXED_STAGING}.`,
-    `Backdrop scene: ${FIXED_SCENE}.`,
-    `Use-case context: ${FIXED_CONTEXT}.`,
+    "Background rule: preserve the same overall product-shot environment style as the reference image.",
     qualityLine,
     `Aspect ratio target: ${els.aspectRatio.value}.`,
     `Art direction: ${FIXED_ART_DIRECTION}.`,
-    "Compliance gate: if any locked trait is missing or wrong, revise internally and return a corrected final image.",
+    "Do not add unrequested props or wardrobe.",
+    "Compliance gate: if identity anchors drift or any locked trait is wrong, revise internally and return a corrected final image.",
   ].join("\n");
 }
 
