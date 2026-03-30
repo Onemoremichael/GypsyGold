@@ -101,7 +101,6 @@ const els = {
   fluffinessValue: document.getElementById("fluffinessValue"),
   accessory: document.getElementById("accessory"),
 
-  apiKey: document.getElementById("apiKey"),
   model: document.getElementById("model"),
   aspectRatio: document.getElementById("aspectRatio"),
 
@@ -120,7 +119,6 @@ const els = {
   footerNote: document.getElementById("footerNote"),
 };
 
-const REFERENCE_IMAGE_PATH = "default-plush-reference.png";
 const FIXED_SCENE = "gift shop shelf display";
 const FIXED_CONTEXT = "visitor keepsake design experience";
 const FIXED_ART_DIRECTION =
@@ -128,7 +126,6 @@ const FIXED_ART_DIRECTION =
 
 let inFlightController = null;
 let isGenerating = false;
-let referenceImagePartPromise = null;
 let hasGeneratedPreview = false;
 
 function setStatus(message, kind = "") {
@@ -195,45 +192,6 @@ function setBuilderVisible(visible) {
   els.builderLayout.hidden = !visible;
   els.footerNote.hidden = !visible;
   els.completionView.hidden = visible;
-}
-
-function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  const chunkSize = 0x8000;
-  let binary = "";
-
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    const chunk = bytes.subarray(i, i + chunkSize);
-    binary += String.fromCharCode(...chunk);
-  }
-
-  return btoa(binary);
-}
-
-async function getReferenceImagePart() {
-  if (referenceImagePartPromise) {
-    return referenceImagePartPromise;
-  }
-
-  referenceImagePartPromise = (async () => {
-    const response = await fetch(REFERENCE_IMAGE_PATH, { cache: "force-cache" });
-    if (!response.ok) {
-      throw new Error(`Reference image not found at ${REFERENCE_IMAGE_PATH}.`);
-    }
-
-    const blob = await response.blob();
-    const mimeType = blob.type || "image/png";
-    const data = arrayBufferToBase64(await blob.arrayBuffer());
-
-    return {
-      inlineData: {
-        mimeType,
-        data,
-      },
-    };
-  })();
-
-  return referenceImagePartPromise;
 }
 
 function missingSelections() {
@@ -329,39 +287,7 @@ async function generateImage() {
     return;
   }
 
-  const apiKey = els.apiKey.value.trim();
-  if (!apiKey) {
-    setStatus("Add your API key in Advanced Settings.", "error");
-    return;
-  }
-
   const prompt = buildPrompt("preview");
-
-  let referenceImagePart;
-  try {
-    referenceImagePart = await getReferenceImagePart();
-  } catch (error) {
-    setStatus(`Reference image failed to load: ${error.message}`, "error");
-    return;
-  }
-
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${els.model.value}:generateContent`;
-  const body = {
-    contents: [
-      {
-        parts: [
-          referenceImagePart,
-          { text: prompt },
-        ],
-      },
-    ],
-    generationConfig: {
-      responseModalities: ["TEXT", "IMAGE"],
-      imageConfig: {
-        aspectRatio: els.aspectRatio.value,
-      },
-    },
-  };
 
   isGenerating = true;
   els.prevStep.disabled = true;
@@ -373,13 +299,16 @@ async function generateImage() {
   const timeoutId = setTimeout(() => inFlightController.abort(), 90000);
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch("/api/generate-image", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        model: els.model.value,
+        aspectRatio: els.aspectRatio.value,
+        prompt,
+      }),
       signal: inFlightController.signal,
     });
 
@@ -389,7 +318,7 @@ async function generateImage() {
       throw new Error(data?.error?.message || "Image generation request failed.");
     }
 
-    const imageUrl = extractImageData(data);
+    const imageUrl = data?.imageUrl || extractImageData(data);
     if (!imageUrl) {
       throw new Error("No image returned. Try adjusting trait selections and generating again.");
     }
@@ -510,7 +439,6 @@ function init() {
   wireStepButtons();
   wireCompletionFlow();
   wireInputs();
-  getReferenceImagePart().catch(() => {});
   setStatus("Ready. Follow the 3 guided steps, then click Generate Plush Preview.");
 }
 

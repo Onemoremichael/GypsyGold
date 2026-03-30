@@ -1,31 +1,42 @@
 # Gypsy Gold Plush Builder Prototype
 
-This version uses a **guided 3-step plush builder** and generates the preview image directly with AI.
+Interactive prototype for a guided "Build-A-Bear style" Gypsy Vanner plush experience.
 
 ## Experience flow
 
 1. Body & coat
-2. Face & mane
-3. Style & scene
+2. Hair & face
+3. Accessories
 
-After selections, users generate:
+At the end of step 3, guests click **Generate Plush Preview** once, then can finalize with
+**Build my Gypsy Vanner!**.
 
-- Plush preview image
-- Final keepsake image
+## Security model
 
-## Notes
+- Gemini API key is loaded from server-side `.env` only.
+- Browser never sees the raw API key.
+- `default-plush-reference.png` is attached server-side as the style anchor for consistent plush output.
+- Key file `.env` is git-ignored by default.
 
-- No SVG horse renderer is used.
-- The opening preview uses a static AI-generated PNG: `default-plush-reference.png`.
-- API/model controls are tucked into **Advanced Settings**.
-- Prompts are constrained to produce a **stuffed plush toy look**, not realistic horse photography.
-- Includes Gypsy Gold logo from `GG-2021-Logo-transparent.png`.
-
-## Run locally
+## Setup
 
 ```bash
-cd /Users/mj/Documents/GypsyGold
-python3 -m http.server 4173
+cd /Users/mj/Documents/GypsyGold_repo
+npm install
+cp .env.example .env
 ```
 
-Then open `http://127.0.0.1:4173`.
+Add your real key to `.env`:
+
+```bash
+GEMINI_API_KEY=your_real_key_here
+PORT=4173
+```
+
+## Run
+
+```bash
+npm start
+```
+
+Open `http://127.0.0.1:4173` (or whatever `PORT` you set).
