@@ -123,6 +123,43 @@ const FIXED_SCENE = "gift shop shelf display";
 const FIXED_CONTEXT = "visitor keepsake design experience";
 const FIXED_ART_DIRECTION =
   "Cute collectible plush doll product render, stitched toy texture, rounded toy proportions, playful souvenir catalog look, child-friendly.";
+const FIXED_STAGING = "simple neutral studio product backdrop with soft lighting";
+
+const strictTraitValues = {
+  coatPattern: {
+    piebald: "piebald pattern with clear cream/white patches",
+    skewbald: "skewbald pattern with clear chestnut/cream patches",
+    midnight: "midnight pattern, mostly deep black with subtle variation",
+    misty_roan: "misty roan slate-gray blend pattern",
+  },
+  coatColor: {
+    jet_black: "jet black",
+    chestnut: "warm chestnut",
+    silver_dapple: "silver dapple gray",
+    golden_bay: "golden bay",
+    cream: "cream",
+  },
+  maneColor: {
+    black: "black",
+    white: "white",
+    blonde: "blonde",
+    brown: "brown",
+    mixed: "mixed two-tone",
+  },
+  tailColor: {
+    black: "black",
+    white: "white",
+    blonde: "blonde",
+    brown: "brown",
+    mixed: "mixed two-tone",
+  },
+  featherColor: {
+    white: "white",
+    black: "black",
+    cream: "cream",
+    mixed: "mixed two-tone",
+  },
+};
 
 let inFlightController = null;
 let isGenerating = false;
@@ -216,41 +253,72 @@ function missingSelections() {
     .map(([label]) => label);
 }
 
+function buildStrictColorRule(label, values, selectedKey) {
+  const selected = values[selectedKey];
+  const alternatives = Object.entries(values)
+    .filter(([key]) => key !== selectedKey)
+    .map(([, value]) => value)
+    .join(", ");
+
+  if (selectedKey === "mixed") {
+    return `${label}: must be ${selected} with two clearly visible tones (not a single-color result).`;
+  }
+
+  return `${label}: must be ${selected} only; do not substitute ${alternatives}.`;
+}
+
 function buildPrompt(kind) {
   const name = state.plushName || "Unnamed Plush";
   const qualityLine =
     kind === "final"
       ? "Make this a polished premium keepsake product shot with rich toy texture detail and balanced lighting."
       : "Create a clear concept preview image that still looks polished and toy-like.";
+  const selectionCard = {
+    plush_name: name,
+    coat_pattern: strictTraitValues.coatPattern[state.coatPattern],
+    coat_base_color: strictTraitValues.coatColor[state.coatColor],
+    fabric: labels.fabricType[state.fabricType],
+    mane_style: labels.maneStyle[state.maneStyle],
+    mane_color: strictTraitValues.maneColor[state.maneColor],
+    tail_color: strictTraitValues.tailColor[state.tailColor],
+    leg_feather_color: strictTraitValues.featherColor[state.featherColor],
+    eye_style: labels.eyeStyle[state.eyeStyle],
+    expression: labels.expressionStyle[state.expressionStyle],
+    accessory: labels.accessory[state.accessory],
+    hair_length_percent: state.hairLength,
+    fluffiness_percent: state.fluffiness,
+  };
 
   return [
     "Create exactly one image.",
-    "Primary subject: a stylized plush toy horse inspired by Gypsy Vanner features.",
-    "Use the provided reference plush image as the core style and shape anchor.",
-    "Keep the same toy-family silhouette and construction style as the reference.",
+    "Primary subject: a stylized Gypsy Vanner-inspired plush toy horse.",
+    "Use the provided reference image for plush shape, stitching language, and toy silhouette only.",
+    "Do not copy color palette from the reference image when it conflicts with selection locks.",
+    "Selection locks below are the source of truth and must be matched exactly.",
     "This must look like a stuffed toy only.",
     "Hard constraints: no realistic horse photography, no biological horse anatomy realism, no real fur detail, no humans.",
-    "Required visual traits: rounded toy proportions, stitched seams, soft stuffed material, collectible plush aesthetic.",
-    "Critical breed cue: keep classic Gypsy Vanner long hair styling in plush form with a long mane, full long tail, and abundant feathering on lower legs.",
-    `Plush name: ${name}.`,
-    `Coat pattern: ${labels.coatPattern[state.coatPattern]}.`,
-    `Coat base color: ${labels.coatColor[state.coatColor]}.`,
-    `Fabric: ${labels.fabricType[state.fabricType]}.`,
+    "Required toy traits: rounded plush proportions, visible stitched seams, soft stuffed texture, collectible keepsake look.",
+    "Critical breed cue: keep classic Gypsy Vanner long hair in plush form with a long mane, full long tail, and abundant lower-leg feathering.",
+    "",
+    "SELECTION CARD (exact requirements):",
+    JSON.stringify(selectionCard, null, 2),
+    "",
+    "STRICT COLOR LOCKS:",
+    buildStrictColorRule("Coat base color", strictTraitValues.coatColor, state.coatColor),
+    buildStrictColorRule("Mane color", strictTraitValues.maneColor, state.maneColor),
+    buildStrictColorRule("Tail color", strictTraitValues.tailColor, state.tailColor),
+    buildStrictColorRule("Leg feather color", strictTraitValues.featherColor, state.featherColor),
+    "",
+    "Pattern rule: keep the selected coat pattern while applying the selected coat base color as the dominant dark/primary regions.",
+    "Hair rule: mane and tail must stay long and dramatic, and leg feathering must be thick and visible.",
     "Size cue: standard hug size plush (about 16 inches).",
-    `Mane style: ${labels.maneStyle[state.maneStyle]}.`,
-    `Mane color: ${labels.maneColor[state.maneColor]}.`,
-    `Tail color: ${labels.tailColor[state.tailColor]}.`,
-    `Leg feather color: ${labels.featherColor[state.featherColor]}.`,
-    `Hair length/fullness level: ${state.hairLength}% (long and dramatic).`,
-    `Eye style: ${labels.eyeStyle[state.eyeStyle]}.`,
-    `Expression: ${labels.expressionStyle[state.expressionStyle]}.`,
-    `Fluffiness: ${state.fluffiness}% plush fullness.`,
-    `Accessory: ${labels.accessory[state.accessory]}.`,
+    `Staging: ${FIXED_STAGING}.`,
     `Backdrop scene: ${FIXED_SCENE}.`,
     `Use-case context: ${FIXED_CONTEXT}.`,
     qualityLine,
     `Aspect ratio target: ${els.aspectRatio.value}.`,
-    `Art direction: ${FIXED_ART_DIRECTION}`,
+    `Art direction: ${FIXED_ART_DIRECTION}.`,
+    "Compliance gate: if any locked trait is missing or wrong, revise internally and return a corrected final image.",
   ].join("\n");
 }
 
