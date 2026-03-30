@@ -1,24 +1,38 @@
-# Gypsy Gold Plush Builder Prototype
+# Gypsy Gold Plush Builder
 
-Interactive prototype for a guided "Build-A-Bear style" Gypsy Vanner plush experience.
+Interactive prototype for a guided Build-A-Bear-style Gypsy Vanner plush customization flow.
 
-## Experience flow
+## What this does
 
-1. Body & coat
-2. Hair & face
-3. Accessories
+- Walks guests through a 3-step customization flow:
+  - Body and coat
+  - Hair and face
+  - Accessories
+- Generates a plush preview image only after all traits are selected.
+- Uses a reference plush image to keep output consistent and recognizable.
+- Ends with a completion screen: **Build my Gypsy Vanner!**
 
-At the end of step 3, guests click **Generate Plush Preview** once, then can finalize with
-**Build my Gypsy Vanner!**.
+## Tech stack
+
+- Static frontend: `index.html`, `app.js`, `styles.css`
+- Local API server: `server.js` (Express)
+- Netlify production API: `netlify/functions/generate-image.cjs`
+- Image model API: Google Gemini via server-side key
 
 ## Security model
 
-- Gemini API key stays server-side only.
-- Browser never sees the raw API key.
-- `default-plush-reference.png` is attached server-side as the identity/style anchor.
+- API key is server-side only (`GEMINI_API_KEY`).
+- Frontend never receives raw key material.
 - `.env` is git-ignored.
+- Netlify uses environment variables for secrets.
 
-## Local setup
+## Prerequisites
+
+- Node.js 18+
+- npm
+- Gemini API key
+
+## Quick start (local Express)
 
 ```bash
 cd /Users/mj/Documents/GypsyGold_repo
@@ -26,52 +40,77 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env`:
+Set `.env`:
 
 ```bash
 GEMINI_API_KEY=your_real_key_here
 PORT=4311
 ```
 
-Run local Express server:
+Run:
 
 ```bash
 npm start
 ```
 
-Open `http://127.0.0.1:4311`.
+Open:
 
-## Netlify-ready architecture
+`http://127.0.0.1:4311`
 
-- Static site is published from repo root (`.`).
-- Image generation runs in Netlify Function:
-  - `netlify/functions/generate-image.cjs`
-- Redirect keeps frontend API unchanged:
-  - `/api/generate-image` -> `/.netlify/functions/generate-image`
-- Netlify config file:
-  - `netlify.toml`
+## Run with Netlify Functions locally
 
-## Netlify deploy steps
-
-1. Push this repo to GitHub (already wired).
-2. In Netlify, create/import site from this repo.
-3. Build settings:
-   - Build command: *(leave empty)*
-   - Publish directory: `.`
-4. In Netlify Site Settings -> Environment Variables, set:
-   - `GEMINI_API_KEY=your_real_key_here`
-5. Deploy.
-
-## Optional CLI deploy
-
-```bash
-npx netlify status
-npx netlify login
-npx netlify deploy --prod
-```
-
-For local Netlify emulation with Functions:
+Use this when you want to mirror production routing/function behavior:
 
 ```bash
 npm run netlify:dev
 ```
+
+Default URL shown by Netlify CLI, typically:
+
+`http://localhost:8888` or the explicit port you pass.
+
+## Deploy to Netlify
+
+1. Import this repo into Netlify.
+2. Build settings:
+   - Build command: leave blank
+   - Publish directory: `.`
+3. Add environment variable in Netlify:
+   - `GEMINI_API_KEY=your_real_key_here`
+4. Deploy.
+
+The redirect in `netlify.toml` maps:
+
+`/api/generate-image` -> `/.netlify/functions/generate-image`
+
+so the frontend API path does not need to change.
+
+## Available scripts
+
+- `npm start` runs local Express server (`server.js`)
+- `npm run dev` runs Express with file watch
+- `npm run netlify:dev` runs Netlify local dev server with functions
+- `npm run netlify:deploy` deploys to Netlify production via CLI
+
+## Project files
+
+- `index.html` main UI
+- `app.js` guided flow + prompt construction + API calls
+- `styles.css` UI styling
+- `default-plush-reference.png` reference identity image
+- `server.js` local backend API
+- `netlify/functions/generate-image.cjs` production serverless API
+- `netlify.toml` Netlify build/functions/redirect config
+
+## Troubleshooting
+
+- `Unexpected token '<'` in API response:
+  - You are likely serving static files only.
+  - Run `npm start` or `npm run netlify:dev` so `/api/generate-image` exists.
+- `Your API key was reported as leaked` or `API key expired`:
+  - Rotate key in Google AI Studio.
+  - Update `.env` locally and Netlify env var in production.
+  - Restart server or redeploy.
+- `Server is missing GEMINI_API_KEY`:
+  - Confirm `.env` exists locally.
+  - Confirm Netlify environment variable is set for deployed site.
