@@ -13,12 +13,12 @@ At the end of step 3, guests click **Generate Plush Preview** once, then can fin
 
 ## Security model
 
-- Gemini API key is loaded from server-side `.env` only.
+- Gemini API key stays server-side only.
 - Browser never sees the raw API key.
-- `default-plush-reference.png` is attached server-side as the style anchor for consistent plush output.
-- Key file `.env` is git-ignored by default.
+- `default-plush-reference.png` is attached server-side as the identity/style anchor.
+- `.env` is git-ignored.
 
-## Setup
+## Local setup
 
 ```bash
 cd /Users/mj/Documents/GypsyGold_repo
@@ -26,17 +26,52 @@ npm install
 cp .env.example .env
 ```
 
-Add your real key to `.env`:
+Edit `.env`:
 
 ```bash
 GEMINI_API_KEY=your_real_key_here
-PORT=4173
+PORT=4311
 ```
 
-## Run
+Run local Express server:
 
 ```bash
 npm start
 ```
 
-Open `http://127.0.0.1:4173` (or whatever `PORT` you set).
+Open `http://127.0.0.1:4311`.
+
+## Netlify-ready architecture
+
+- Static site is published from repo root (`.`).
+- Image generation runs in Netlify Function:
+  - `netlify/functions/generate-image.cjs`
+- Redirect keeps frontend API unchanged:
+  - `/api/generate-image` -> `/.netlify/functions/generate-image`
+- Netlify config file:
+  - `netlify.toml`
+
+## Netlify deploy steps
+
+1. Push this repo to GitHub (already wired).
+2. In Netlify, create/import site from this repo.
+3. Build settings:
+   - Build command: *(leave empty)*
+   - Publish directory: `.`
+4. In Netlify Site Settings -> Environment Variables, set:
+   - `GEMINI_API_KEY=your_real_key_here`
+5. Deploy.
+
+## Optional CLI deploy
+
+```bash
+npx netlify status
+npx netlify login
+npx netlify deploy --prod
+```
+
+For local Netlify emulation with Functions:
+
+```bash
+npm run netlify:dev
+```

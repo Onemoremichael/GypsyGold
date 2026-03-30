@@ -1,17 +1,6 @@
-import express from "express";
-import dotenv from "dotenv";
-import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+const fs = require("node:fs/promises");
+const path = require("node:path");
 
-dotenv.config();
-
-const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const PORT = Number(process.env.PORT || 4173);
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ALLOWED_MODELS = new Set([
   "gemini-2.5-flash-image",
   "gemini-3.1-flash-image-preview",
@@ -24,34 +13,40 @@ const ipBuckets = new Map();
 
 let referencePartPromise = null;
 
-function getClientIp(req) {
-  const forwarded = req.headers["x-forwarded-for"];
+function json(statusCode, body) {
+  return {
+    statusCode,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+    body: JSON.stringify(body),
+  };
+}
+
+function getClientIp(event) {
+  const headers = event.headers || {};
+  const forwarded = headers["x-forwarded-for"] || headers["X-Forwarded-For"];
   if (typeof forwarded === "string" && forwarded.length > 0) {
     return forwarded.split(",")[0].trim();
   }
 
-  return req.socket.remoteAddress || "unknown";
+  const netlifyIp = headers["x-nf-client-connection-ip"] || headers["X-Nf-Client-Connection-Ip"];
+  return typeof netlifyIp === "string" && netlifyIp.length > 0 ? netlifyIp : "unknown";
 }
 
-function checkRateLimit(req, res, next) {
-  const ip = getClientIp(req);
+function isRateLimited(event) {
+  const ip = getClientIp(event);
   const now = Date.now();
-
-  const existing = ipBuckets.get(ip) || [];
-  const recent = existing.filter((ts) => now - ts < RATE_WINDOW_MS);
+  const recent = (ipBuckets.get(ip) || []).filter((ts) => now - ts < RATE_WINDOW_MS);
 
   if (recent.length >= RATE_MAX_REQUESTS) {
-    res.status(429).json({
-      error: {
-        message: "Rate limit reached for this demo. Please try again later.",
-      },
-    });
-    return;
+    return true;
   }
 
   recent.push(now);
   ipBuckets.set(ip, recent);
-  next();
+  return false;
 }
 
 async function getReferencePart() {
@@ -60,64 +55,92 @@ async function getReferencePart() {
   }
 
   referencePartPromise = (async () => {
-    const refPath = path.join(__dirname, "default-plush-reference.png");
-    const data = await fs.readFile(refPath);
-    return {
-      inlineData: {
-        mimeType: "image/png",
-        data: data.toString("base64"),
-      },
-    };
+    const candidatePaths = [
+      path.resolve(__dirname, "../../default-plush-reference.png"),
+      path.resolve(process.cwd(), "default-plush-reference.png"),
+    ];
+
+    for (const refPath of candidatePaths) {
+      try {
+        const data = await fs.readFile(refPath);
+        return {
+          inlineData: {
+            mimeType: "image/png",
+            data: data.toString("base64"),
+          },
+        };
+      } catch {
+        // Try next path.
+      }
+    }
+
+    throw new Error("default-plush-reference.png could not be loaded in function runtime.");
   })();
 
   return referencePartPromise;
 }
 
-app.use(express.json({ limit: "1mb" }));
-app.use(checkRateLimit);
-
-app.post("/api/generate-image", async (req, res) => {
+exports.handler = async (event) => {
   try {
-    if (!GEMINI_API_KEY) {
-      res.status(500).json({
-        error: {
-          message: "Server is missing GEMINI_API_KEY. Add it to .env before starting.",
-        },
-      });
-      return;
+    if (event.httpMethod !== "POST") {
+      return json(405, { error: { message: "Method not allowed." } });
     }
 
-    const { model, aspectRatio, prompt } = req.body || {};
+    if (isRateLimited(event)) {
+      return json(429, {
+        error: {
+          message: "Rate limit reached for this demo. Please try again later.",
+        },
+      });
+    }
+
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+    if (!GEMINI_API_KEY) {
+      return json(500, {
+        error: {
+          message: "Server is missing GEMINI_API_KEY. Set it in Netlify Environment Variables.",
+        },
+      });
+    }
+
+    let parsedBody;
+    try {
+      parsedBody = JSON.parse(event.body || "{}");
+    } catch {
+      return json(400, {
+        error: {
+          message: "Invalid JSON request body.",
+        },
+      });
+    }
+
+    const { model, aspectRatio, prompt } = parsedBody;
 
     if (!ALLOWED_MODELS.has(model)) {
-      res.status(400).json({
+      return json(400, {
         error: {
           message: "Unsupported model.",
         },
       });
-      return;
     }
 
     if (!ALLOWED_RATIOS.has(aspectRatio)) {
-      res.status(400).json({
+      return json(400, {
         error: {
           message: "Unsupported aspect ratio.",
         },
       });
-      return;
     }
 
     if (typeof prompt !== "string" || prompt.trim().length < 20 || prompt.length > 8000) {
-      res.status(400).json({
+      return json(400, {
         error: {
           message: "Prompt is missing or invalid.",
         },
       });
-      return;
     }
 
     const referencePart = await getReferencePart();
-
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     const requestBody = {
       contents: [
@@ -149,43 +172,37 @@ app.post("/api/generate-image", async (req, res) => {
       body: JSON.stringify(requestBody),
     });
 
-    const upstreamJson = await upstream.json();
-
+    const upstreamJson = await upstream.json().catch(() => null);
     if (!upstream.ok) {
-      const message = upstreamJson?.error?.message || "Image generation failed upstream.";
-      res.status(upstream.status).json({ error: { message } });
-      return;
+      return json(upstream.status, {
+        error: {
+          message: upstreamJson?.error?.message || "Image generation failed upstream.",
+        },
+      });
     }
 
-    const parts = (upstreamJson.candidates || []).flatMap((candidate) => candidate?.content?.parts || []);
+    const parts = (upstreamJson?.candidates || []).flatMap((candidate) => candidate?.content?.parts || []);
     const imagePart = parts.find((part) => part?.inlineData?.data || part?.inline_data?.data);
 
     if (!imagePart) {
-      res.status(502).json({
+      return json(502, {
         error: {
           message: "Model returned no image data.",
         },
       });
-      return;
     }
 
     const inline = imagePart.inlineData || imagePart.inline_data;
     const mimeType = inline.mimeType || inline.mime_type || "image/png";
 
-    res.json({
+    return json(200, {
       imageUrl: `data:${mimeType};base64,${inline.data}`,
     });
   } catch (error) {
-    res.status(500).json({
+    return json(500, {
       error: {
         message: error?.message || "Unexpected server error.",
       },
     });
   }
-});
-
-app.use(express.static(__dirname));
-
-app.listen(PORT, () => {
-  console.log(`GypsyGold app listening on http://127.0.0.1:${PORT}`);
-});
+};
