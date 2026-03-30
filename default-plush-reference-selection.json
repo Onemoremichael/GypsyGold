@@ -1,0 +1,55 @@
+{
+  "picked": "default-plush-reference-candidate-2.png",
+  "score": 59,
+  "parsed": {
+    "vanner_silhouette": 9,
+    "long_mane_forelock": 10,
+    "full_tail": 10,
+    "heavy_leg_feathering": 10,
+    "plush_toy_look": 10,
+    "overall_reference_quality": 10,
+    "short_reason": "Excellent plush representation of a Gypsy Vanner, capturing signature traits like heavy feathering, mane, and build perfectly."
+  },
+  "reason": "Excellent plush representation of a Gypsy Vanner, capturing signature traits like heavy feathering, mane, and build perfectly.",
+  "all": [
+    {
+      "file": "default-plush-reference-candidate-2.png",
+      "score": 59,
+      "parsed": {
+        "vanner_silhouette": 9,
+        "long_mane_forelock": 10,
+        "full_tail": 10,
+        "heavy_leg_feathering": 10,
+        "plush_toy_look": 10,
+        "overall_reference_quality": 10,
+        "short_reason": "Excellent plush representation of a Gypsy Vanner, capturing signature traits like heavy feathering, mane, and build perfectly."
+      }
+    },
+    {
+      "file": "default-plush-reference-candidate-3.png",
+      "score": 58,
+      "parsed": {
+        "vanner_silhouette": 8,
+        "long_mane_forelock": 10,
+        "full_tail": 10,
+        "heavy_leg_feathering": 10,
+        "plush_toy_look": 10,
+        "overall_reference_quality": 10,
+        "short_reason": "Excellent plush reference, accurately showcasing the Gypsy Vanner's signature heavy mane, tail, and leg feathering."
+      }
+    },
+    {
+      "file": "default-plush-reference-candidate-1.png",
+      "score": 56,
+      "parsed": {
+        "vanner_silhouette": 7,
+        "long_mane_forelock": 10,
+        "full_tail": 10,
+        "heavy_leg_feathering": 10,
+        "plush_toy_look": 10,
+        "overall_reference_quality": 9,
+        "short_reason": "Excellent plush reference with strong Gypsy Vanner features like abundant mane, tail, and heavy leg feathering."
+      }
+    }
+  ]
+}

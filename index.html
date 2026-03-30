@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gypsy Gold | Plush Builder Wizard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Zilla+Slab:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="texture"></div>
+
+    <header class="hero" id="heroSection">
+      <div class="brand-row">
+        <img class="logo" src="GG-2021-Logo-transparent.png" alt="Gypsy Gold logo" />
+        <div>
+          <p class="kicker">Gypsy Gold Farm • Ocala, Florida</p>
+          <h1>Design Your Plush Vanner</h1>
+          <p>
+            Guided concept flow: choose a few playful plush traits, then generate a toy-style
+            preview of the keepsake.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout" id="builderLayout">
+      <section class="panel wizard-panel">
+        <h2>Build Flow</h2>
+
+        <ol class="stepper" id="stepper">
+          <li class="step active" data-step="1">1. Body & Coat</li>
+          <li class="step" data-step="2">2. Hair & Face</li>
+          <li class="step" data-step="3">3. Accessories</li>
+        </ol>
+
+        <div class="step-card active" id="step1">
+          <label class="field">
+            <span>Plush Name</span>
+            <input id="plushName" type="text" value="Magnolia Puff" maxlength="28" />
+          </label>
+
+          <label class="field">
+            <span>Coat Pattern</span>
+            <select id="coatPattern">
+              <option value="piebald">Piebald (Black + Cream)</option>
+              <option value="skewbald">Skewbald (Chestnut + Cream)</option>
+              <option value="midnight">Midnight (Deep Black)</option>
+              <option value="misty_roan">Misty Roan (Slate Gray)</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Coat Base Color</span>
+            <select id="coatColor">
+              <option value="jet_black">Jet Black</option>
+              <option value="chestnut">Warm Chestnut</option>
+              <option value="silver_dapple">Silver Dapple</option>
+              <option value="golden_bay">Golden Bay</option>
+              <option value="cream">Cream</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Fabric Feel</span>
+            <select id="fabricType">
+              <option value="minky">Minky Soft</option>
+              <option value="velvet">Velvet Luxe</option>
+              <option value="fleece">Fleece Cozy</option>
+              <option value="corduroy">Corduroy Retro</option>
+            </select>
+          </label>
+
+        </div>
+
+        <div class="step-card" id="step2">
+          <label class="field">
+            <span>Mane Style</span>
+            <select id="maneStyle">
+              <option value="long_flowing">Long Flowing</option>
+              <option value="waterfall">Waterfall Side Mane</option>
+              <option value="braided_long">Long Braided</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Mane Color</span>
+            <select id="maneColor">
+              <option value="black">Black</option>
+              <option value="white">White</option>
+              <option value="blonde">Blonde</option>
+              <option value="brown">Brown</option>
+              <option value="mixed">Mixed Two-Tone</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Tail Color</span>
+            <select id="tailColor">
+              <option value="black">Black</option>
+              <option value="white">White</option>
+              <option value="blonde">Blonde</option>
+              <option value="brown">Brown</option>
+              <option value="mixed">Mixed Two-Tone</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Leg Feather Color</span>
+            <select id="featherColor">
+              <option value="white">White Feathering</option>
+              <option value="black">Black Feathering</option>
+              <option value="cream">Cream Feathering</option>
+              <option value="mixed">Mixed Feathering</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Eye Style</span>
+            <select id="eyeStyle">
+              <option value="button">Button Eyes</option>
+              <option value="sparkle">Sparkle Safety Eyes</option>
+              <option value="embroidered">Embroidered Sleepy Eyes</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Expression</span>
+            <select id="expressionStyle">
+              <option value="happy">Happy Smile</option>
+              <option value="shy">Shy Blush</option>
+              <option value="wink">Playful Wink</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Hair Length & Fullness</span>
+            <input id="hairLength" type="range" min="70" max="100" value="92" />
+            <output id="hairLengthValue">92%</output>
+          </label>
+
+          <label class="field">
+            <span>Plush Fluffiness</span>
+            <input id="fluffiness" type="range" min="35" max="100" value="80" />
+            <output id="fluffinessValue">80%</output>
+          </label>
+        </div>
+
+        <div class="step-card" id="step3">
+          <label class="field">
+            <span>Accessory</span>
+            <select id="accessory">
+              <option value="flower">Flower Crown</option>
+              <option value="bow">Satin Bow</option>
+              <option value="bandana">Scout Bandana</option>
+              <option value="tag">Name Tag Charm</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="step-nav">
+          <button id="prevStep" class="btn ghost" type="button">Back</button>
+          <button id="nextStep" class="btn secondary" type="button">Next</button>
+        </div>
+
+        <details class="settings">
+          <summary>Advanced Settings</summary>
+
+          <label class="field">
+            <span>API Key</span>
+            <input
+              id="apiKey"
+              type="password"
+              value="[REMOVED_GEMINI_KEY]"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="field">
+            <span>Image Model</span>
+            <select id="model">
+              <option value="gemini-2.5-flash-image">Balanced Image Model</option>
+              <option value="gemini-3.1-flash-image-preview">Fast Preview Model</option>
+              <option value="gemini-3-pro-image-preview">High Fidelity Model</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Aspect Ratio</span>
+            <select id="aspectRatio">
+              <option value="1:1">1:1</option>
+              <option value="4:3">4:3</option>
+              <option value="3:2">3:2</option>
+              <option value="16:9">16:9</option>
+            </select>
+          </label>
+        </details>
+      </section>
+
+      <section class="panel preview-panel">
+        <h2>Live Plush Preview</h2>
+        <p id="summaryText"></p>
+
+        <div class="preview-frame" id="previewFrame">
+          <img
+            id="previewImage"
+            src="default-plush-reference.png"
+            alt="Starter plush concept preview"
+          />
+          <div class="placeholder" id="previewPlaceholder" hidden>
+            Choose traits and click <strong>Generate Plush Preview</strong>.
+          </div>
+        </div>
+
+        <button id="buildVannerBtn" class="btn berry build-btn" type="button" hidden>
+          Build my Gypsy Vanner!
+        </button>
+
+        <p class="status" id="statusText"></p>
+      </section>
+    </main>
+
+    <section class="completion-view" id="completionView" hidden>
+      <article class="completion-card">
+        <div class="completion-badge">
+          <img src="GG-2021-Logo-transparent.png" alt="Gypsy Gold badge" />
+          <span>Official Gypsy Gold Build</span>
+        </div>
+        <h2>Your Gypsy Vanner Is Ready!</h2>
+        <p id="completionCaption"></p>
+        <img id="completionImage" alt="Completed Gypsy Vanner plush build" />
+        <button id="startOverBtn" class="btn secondary" type="button">Create Another</button>
+      </article>
+    </section>
+
+    <footer class="footer" id="footerNote">Plush-first prototype powered by AI image generation</footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

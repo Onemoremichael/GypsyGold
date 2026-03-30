@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Starter mix plush horse concept">
+  <defs>
+    <linearGradient id="bgSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f7e7cd" />
+      <stop offset="58%" stop-color="#efcf9d" />
+      <stop offset="100%" stop-color="#ddba80" />
+    </linearGradient>
+    <radialGradient id="glowLeft" cx="22%" cy="14%" r="42%">
+      <stop offset="0%" stop-color="#fff7e7" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#fff7e7" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glowRight" cx="82%" cy="18%" r="36%">
+      <stop offset="0%" stop-color="#ffd6df" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#ffd6df" stop-opacity="0" />
+    </radialGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#6d472a" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="900" fill="url(#bgSky)" />
+  <rect width="1200" height="900" fill="url(#glowLeft)" />
+  <rect width="1200" height="900" fill="url(#glowRight)" />
+
+  <g opacity="0.52" fill="#fff7ea">
+    <circle cx="130" cy="145" r="10" />
+    <circle cx="1010" cy="130" r="8" />
+    <circle cx="920" cy="190" r="6" />
+    <circle cx="190" cy="225" r="7" />
+    <circle cx="1060" cy="260" r="10" />
+  </g>
+
+  <g filter="url(#drop)">
+    <ellipse cx="585" cy="708" rx="324" ry="64" fill="#a57c47" fill-opacity="0.32" />
+
+    <g transform="translate(132,152)">
+      <ellipse cx="215" cy="380" rx="102" ry="128" fill="#f4ead8" />
+      <ellipse cx="492" cy="360" rx="305" ry="176" fill="#f8f2e3" />
+      <ellipse cx="500" cy="406" rx="214" ry="126" fill="#fff9ec" />
+
+      <ellipse cx="825" cy="301" rx="132" ry="105" fill="#f8f1e2" />
+      <ellipse cx="905" cy="333" rx="68" ry="52" fill="#ebd2bc" />
+
+      <ellipse cx="769" cy="195" rx="31" ry="56" transform="rotate(-14 769 195)" fill="#f8f1e2" />
+      <ellipse cx="822" cy="185" rx="31" ry="56" transform="rotate(14 822 185)" fill="#f8f1e2" />
+
+      <rect x="650" y="444" width="82" height="176" rx="40" fill="#f8f1e2" />
+      <rect x="559" y="456" width="78" height="164" rx="38" fill="#f8f1e2" />
+      <rect x="383" y="448" width="80" height="172" rx="39" fill="#f8f1e2" />
+      <rect x="294" y="444" width="79" height="176" rx="40" fill="#f8f1e2" />
+
+      <ellipse cx="691" cy="627" rx="34" ry="22" fill="#d9c3a9" />
+      <ellipse cx="597" cy="626" rx="33" ry="21" fill="#d9c3a9" />
+      <ellipse cx="423" cy="627" rx="34" ry="22" fill="#d9c3a9" />
+      <ellipse cx="333" cy="628" rx="33" ry="22" fill="#d9c3a9" />
+
+      <ellipse cx="452" cy="358" rx="124" ry="78" fill="#202228" />
+      <ellipse cx="580" cy="307" rx="92" ry="52" fill="#8f5334" />
+      <ellipse cx="794" cy="321" rx="42" ry="32" fill="#24252d" />
+      <ellipse cx="659" cy="472" rx="32" ry="34" fill="#8f5334" />
+      <ellipse cx="311" cy="442" rx="30" ry="28" fill="#202228" />
+
+      <g fill="#21242b">
+        <circle cx="748" cy="304" r="42" />
+        <circle cx="715" cy="343" r="38" />
+        <circle cx="704" cy="389" r="36" />
+        <circle cx="711" cy="435" r="34" />
+      </g>
+
+      <g stroke="#f6e5c4" stroke-width="6" stroke-linecap="round" stroke-dasharray="6 11" fill="none" opacity="0.9">
+        <path d="M270 404 Q500 468 719 395" />
+        <path d="M728 333 Q818 295 903 334" />
+        <path d="M134 386 Q175 434 237 442" />
+      </g>
+
+      <g>
+        <circle cx="836" cy="292" r="17" fill="#272321" />
+        <line x1="828" y1="284" x2="844" y2="300" stroke="#fff7f1" stroke-width="2.6" />
+        <line x1="844" y1="284" x2="828" y2="300" stroke="#fff7f1" stroke-width="2.6" />
+      </g>
+
+      <path d="M880 362 Q897 378 916 362" fill="none" stroke="#664b39" stroke-width="5" stroke-linecap="round" />
+
+      <g>
+        <circle cx="822" cy="170" r="15" fill="#f4d56b" />
+        <circle cx="841" cy="168" r="9" fill="#f49ec4" />
+        <circle cx="810" cy="153" r="9" fill="#f49ec4" />
+        <circle cx="811" cy="187" r="9" fill="#f49ec4" />
+      </g>
+
+      <path d="M840 228 Q876 191 912 228 Q890 232 876 253 Q861 232 840 228 Z" fill="#d56582" />
+      <path d="M830 392 L913 409 L857 458 Z" fill="#5f80c7" />
+    </g>
+  </g>
+
+  <g transform="translate(122,76)">
+    <rect x="0" y="0" width="322" height="66" rx="33" fill="#3e2a20" fill-opacity="0.78" />
+    <text x="161" y="42" fill="#fff2dd" font-family="Nunito, sans-serif" font-size="30" font-weight="800" text-anchor="middle">
+      Starter Mix Plush
+    </text>
+  </g>
+
+  <g transform="translate(817,112)">
+    <rect x="0" y="0" width="258" height="178" rx="20" fill="#fff6e8" fill-opacity="0.84" stroke="#c29763" />
+    <text x="20" y="40" fill="#634633" font-family="Nunito, sans-serif" font-size="24" font-weight="800">Mixed Traits</text>
+    <text x="20" y="76" fill="#6b5040" font-family="Nunito, sans-serif" font-size="20">- Piebald + Skewbald patches</text>
+    <text x="20" y="106" fill="#6b5040" font-family="Nunito, sans-serif" font-size="20">- Curly mane + bow + flower</text>
+    <text x="20" y="136" fill="#6b5040" font-family="Nunito, sans-serif" font-size="20">- Big cuddly proportions</text>
+  </g>
+</svg>
